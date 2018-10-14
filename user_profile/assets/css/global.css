@@ -702,6 +702,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
   font-family: "Work Sans", sans-serif;
   color: #222;
+  text-align: center;
 }
 
 /* line 11, ../sass/circle/core/type.sass */
@@ -1531,6 +1532,7 @@ li:only-child .circle--clone--remove {
 /* line 49, ../sass/circle/components/headers.sass */
 .circle--page--header h1, .circle--page--header h2, .circle--page--header h3, .circle--page--header h4, .circle--page--header h5, .circle--page--header h6 {
   margin: 0;
+  text-align:center;
 }
 /* line 51, ../sass/circle/components/headers.sass */
 .circle--page--header p {
