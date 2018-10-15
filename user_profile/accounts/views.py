@@ -60,7 +60,7 @@ def sign_out(request):
 def display_account(request):
     current_user = request.user
     try:
-        current_user_attributes = Profile.objects.get(pk=current_user)
+        current_user_attributes = Profile.objects.filter(user_id=current_user.id).get()
         profile_form = ProfileForm(initial= model_to_dict(current_user_attributes))
         user_form = UserForm(initial=model_to_dict(current_user))
         if request.method == 'POST':
@@ -70,7 +70,7 @@ def display_account(request):
                 profile_form.save()
                 user_form.save()
                 return HttpResponseRedirect(reverse('accounts:display_account'))
-        return render(request, 'accounts/display_account.html', {"user": current_user_attributes, "profile_form":profile_form, "user_form":user_form})
+        return render(request, 'accounts/display_account.html', {"user": current_user, "profile":current_user_attributes, "profile_form":profile_form, "user_form":user_form})
     except:
         profile_form = ProfileForm()
         user_form = UserForm(initial=model_to_dict(current_user))
@@ -89,14 +89,14 @@ def display_account(request):
 def edit_profile(request):
     current_user = request.user
     try:
-        current_user_attributes = Profile.objects.get(pk=current_user)
-        profile_form = ProfileForm(initial=model_to_dict(current_user_attributes))
+        current_user_attributes = Profile.objects.filter(user_id=current_user.id).get()
+        profile_form = ProfileForm(initial=model_to_dict(current_user_attributes), user_id=current_user.id)
         user_form = UserForm(initial=model_to_dict(current_user))
         if request.method == 'POST':
-            profile_form = ProfileForm(data=request.POST, files=request.avatar)
+            profile_form = ProfileForm(data=request.POST, files=request.FILES, user_id=current_user.id)
             user_form = UserForm(data=request.POST, instance=request.user)
             if profile_form.is_valid():
-                profile_form.save()
+                profile_form.save(user_id=current_user.id)
                 user_form.save()
                 return HttpResponseRedirect(reverse('accounts:display_account'))
         return render(request, 'accounts/edit_account.html',
@@ -105,11 +105,10 @@ def edit_profile(request):
         profile_form = ProfileForm()
         user_form = UserForm(initial=model_to_dict(current_user))
         if request.method == 'POST':
-            profile_form = ProfileForm(data=request.POST, files=request.FILES)
+            profile_form = ProfileForm(data=request.POST, files=request.FILES, user_id=current_user.id)
             user_form = UserForm(data=request.POST, instance=request.user)
             if profile_form.is_valid():
-                profile_form.fields['user_id']=current_user
-                profile_form.save()
+                profile_form.save(user_id=current_user.id)
                 user_form.save()
                 return HttpResponseRedirect(reverse('accounts:display_account'))
             else:

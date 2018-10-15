@@ -7,9 +7,19 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, Pass
 
 class ProfileForm(forms.ModelForm):
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y'])
-    bio = forms.CharField(min_length=10)
+    bio = forms.CharField(min_length=10, widget=forms.Textarea)
     avatar = forms.ImageField()
-    user = forms.
+
+    def __init__(self, user_id=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_id = user_id
+
+    def save(self, commit=True, user_id=None):
+        if not user_id:
+            raise forms.ValidationError("User must be logged in to make changes.")
+        else:
+            self.user_id = user_id
+            return super().save(commit=commit)
 
     class Meta:
         model = models.Profile
@@ -24,8 +34,12 @@ class UserForm(forms.ModelForm):
         fields = ["first_name",
                   "last_name",
                    "email"]
-
 class ChangePasswordForm(PasswordChangeForm):
+
+    """
+    Using inheritance to leverage existing form with altered labels for display.
+    All save methods remain the same.
+    """
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(user, *args, **kwargs)

@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
+{% load static %}
 
 {% block title %}Sign In | {{ super }}{% endblock %}
 
 {% block body %}
+<h1>{{user.first_name}} {{user.last_name}}</h1>
+<img src="{% static current_user_attributes.avatar %}">
     {{ user_form.as_p }}
     {{ profile_form.as_p }}
     <a href="{% url 'accounts:edit_profile' %}">Edit Profile</a>
