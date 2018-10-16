@@ -88,34 +88,21 @@ def display_account(request):
 @login_required
 def edit_profile(request):
     current_user = request.user
-    try:
-        current_user_attributes = Profile.objects.filter(user_id=current_user.id).get()
-        profile_form = ProfileForm(initial=model_to_dict(current_user_attributes), user_id=current_user.id)
-        user_form = UserForm(initial=model_to_dict(current_user))
-        if request.method == 'POST':
-            profile_form = ProfileForm(data=request.POST, files=request.FILES, user_id=current_user.id)
-            user_form = UserForm(data=request.POST, instance=request.user)
-            if profile_form.is_valid():
-                profile_form.save(user_id=current_user.id)
-                user_form.save()
-                return HttpResponseRedirect(reverse('accounts:display_account'))
-        return render(request, 'accounts/edit_account.html',
-                      {"user": current_user_attributes, "profile_form": profile_form, "user_form": user_form})
-    except:
-        profile_form = ProfileForm()
-        user_form = UserForm(initial=model_to_dict(current_user))
-        if request.method == 'POST':
-            profile_form = ProfileForm(data=request.POST, files=request.FILES, user_id=current_user.id)
-            user_form = UserForm(data=request.POST, instance=request.user)
-            if profile_form.is_valid():
-                profile_form.save(user_id=current_user.id)
-                user_form.save()
-                return HttpResponseRedirect(reverse('accounts:display_account'))
-            else:
-                print(profile_form.errors)
-                print(profile_form.data)
-                print(request.POST)
-        return render(request, 'accounts/edit_account.html', {"profile_form": profile_form, "user_form": user_form})
+    profile_attributes = Profile.objects.filter(user_id=current_user.id).get()
+    profile_form = ProfileForm(initial=model_to_dict(profile_attributes))
+    ##user_form = UserForm(initial=model_to_dict(current_user))
+    if request.method == 'POST':
+        submitted_profile = ProfileForm(data=request.POST, files=request.FILES)
+        ##profile_form.data, profile_form.avatar = request.POST, request.FILES
+        ##user_form.data, user_form.instance = request.POST, request.user
+        ##if profile_form.is_valid() and user_form.is_valid():
+        profile = submitted_profile.save(commit=False)
+        profile.user = current_user
+        profile.save()
+        ##user_form.save()
+        return HttpResponseRedirect(reverse('accounts:display_account'))
+    return render(request, 'accounts/edit_account.html',{"profile_form": profile_form})
+
 
 @login_required
 def change_password(request):
