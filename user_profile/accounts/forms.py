@@ -1,10 +1,11 @@
 from django import forms
 from django.core.validators import validate_email
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.http import QueryDict
-#Create a “profile” view to display a user Include a link to edit the profile.
+
 
 from . import models
+
 
 class ProfileForm(forms.ModelForm):
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y'])
@@ -19,20 +20,19 @@ class ProfileForm(forms.ModelForm):
         if data:
             stripped_kwargs = kwargs
             for k, v in kwargs.get('data').items():
-                if k in ProfileForm.declared_fields.keys() or k =='csrfmiddlewaretoken':
-                    cleaned_data.update({k:v})
+                if k in ProfileForm.declared_fields.keys() or k == 'csrfmiddlewaretoken':
+                    cleaned_data.update({k: v})
             qdict = QueryDict('', mutable=True)
             qdict.update(cleaned_data)
-            stripped_kwargs['data']=qdict
+            stripped_kwargs['data'] = qdict
             super().__init__(*args, **stripped_kwargs)
         else:
             super().__init__(*args, **kwargs)
 
     class Meta:
         model = models.Profile
-        fields = ['date_of_birth',
-                  'bio',
-                  'avatar']
+        fields = ['date_of_birth', 'bio', 'avatar']
+
 
 class UserForm(forms.ModelForm):
     first_name = forms.CharField(min_length=1)
@@ -45,20 +45,18 @@ class UserForm(forms.ModelForm):
         if data:
             stripped_kwargs = kwargs
             for k, v in kwargs.get('data').items():
-                if k in UserForm.declared_fields.keys() or k =='csrfmiddlewaretoken':
-                    cleaned_data.update({k:v})
+                if k in UserForm.declared_fields.keys() or k == 'csrfmiddlewaretoken':
+                    cleaned_data.update({k: v})
             qdict = QueryDict('', mutable=True)
             qdict.update(cleaned_data)
-            stripped_kwargs['data']=qdict
+            stripped_kwargs['data'] = qdict
             super().__init__(*args, **stripped_kwargs)
         else:
             super().__init__(*args, **kwargs)
 
     class Meta:
         model = models.User
-        fields = ["first_name",
-                  "last_name",
-                   "email"]
+        fields = ["first_name", "last_name", "email"]
 
 
 class ChangePasswordForm(PasswordChangeForm):
@@ -73,6 +71,3 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['old_password'].label = "Current Password"
         self.fields['new_password1'].label = "New Password"
         self.fields['new_password2'].label = "Confirm Password"
-
-
-

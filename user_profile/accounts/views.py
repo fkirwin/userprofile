@@ -10,6 +10,7 @@ from django.forms.models import model_to_dict
 from .models import Profile
 from .forms import ProfileForm, UserForm, ChangePasswordForm
 
+
 def sign_in(request):
     form = AuthenticationForm()
     if request.method == 'POST':
@@ -46,7 +47,7 @@ def sign_up(request):
                 password=form.cleaned_data['password1']
             )
             login(request, user)
-            messages.success(request,"You're now a user! You've been signed in, too.")
+            messages.success(request, "You're now a user! You've been signed in, too.")
             return HttpResponseRedirect(reverse('accounts:display_account'))
     return render(request, 'accounts/sign_up.html', {'form': form})
 
@@ -63,9 +64,7 @@ def display_account(request):
         profile = Profile.objects.filter(user_id=current_user.id).get()
         return render(request, 'accounts/display_account.html', {"profile": profile})
     except:
-        profile = Profile.objects.filter(user_id=current_user.id).get()
-        return render(request, 'accounts/display_account.html', {"profile": profile})
-        #return render(request, 'accounts/display_account.html')
+        return render(request, 'accounts/display_account.html')
 
 
 
