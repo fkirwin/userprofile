@@ -63,7 +63,9 @@ def display_account(request):
         profile = Profile.objects.filter(user_id=current_user.id).get()
         return render(request, 'accounts/display_account.html', {"profile": profile})
     except:
-        return render(request, 'accounts/display_account.html')
+        profile = Profile.objects.filter(user_id=current_user.id).get()
+        return render(request, 'accounts/display_account.html', {"profile": profile})
+        #return render(request, 'accounts/display_account.html')
 
 
 

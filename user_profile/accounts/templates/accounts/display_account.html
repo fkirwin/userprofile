@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% load static from staticfiles %}
+{% load static %}
 
 {% block title %}Sign In | {{ super }}{% endblock %}
 
@@ -10,8 +11,10 @@
     {% if profile %}
         <div class="circle--group--list">
             <li>Name: {{user.first_name}} {{user.last_name}}</li>
-            <li>Profile Picture:<img src="user_profile/assets/images/test.png"></li>
+            <li>Avatar:<img src="{% static 'images/'|add:profile.avatar.path %}"></li>
             <li>Email: {{user.email}}</li>
+            <li>Date of Birth: {{profile.date_of_birth}}</li>
+            <li>Bio: <textarea>{{profile.bio}}</textarea></li>
         </div>
     {% else %}
         <h2>No profile exists.  Select the edit link to change that.</h2>
