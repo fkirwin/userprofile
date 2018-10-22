@@ -1,12 +1,20 @@
 {% extends "layout.html" %}
-{% load static %}
+{% load static from staticfiles %}
 
 {% block title %}Sign In | {{ super }}{% endblock %}
 
+{% load static %}
+
 {% block body %}
-<h1>{{user.first_name}} {{user.last_name}}</h1>
-<img src="{% static current_user_attributes.avatar %}">
-    {{ user_form.as_p }}
-    {{ profile_form.as_p }}
+    <h1>{{user.username}}</h1>
+    {% if profile %}
+        <div class="circle--group--list">
+            <li>Name: {{user.first_name}} {{user.last_name}}</li>
+            <li>Profile Picture:<img src="user_profile/assets/images/test.png"></li>
+            <li>Email: {{user.email}}</li>
+        </div>
+    {% else %}
+        <h2>No profile exists.  Select the edit link to change that.</h2>
+    {% endif %}
     <a href="{% url 'accounts:edit_profile' %}">Edit Profile</a>
 {% endblock %}

@@ -5,6 +5,7 @@
 {% block body %}
 <form method="POST" enctype="multipart/form-data" action="{% url 'accounts:edit_profile' %}">
     {% csrf_token %}
+    {{ user_form.as_p }}
     {{ profile_form.as_p }}
     <input type="submit" class="button-primary" value="Submit">
 </form>

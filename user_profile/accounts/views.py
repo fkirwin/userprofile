@@ -20,7 +20,7 @@ def sign_in(request):
                 if user.is_active:
                     login(request, user)
                     return HttpResponseRedirect(
-                        reverse('accounts:display_account')  # TODO: go to profile
+                        reverse('accounts:display_account')
                     )
                 else:
                     messages.error(
@@ -47,7 +47,7 @@ def sign_up(request):
             )
             login(request, user)
             messages.success(request,"You're now a user! You've been signed in, too.")
-            return HttpResponseRedirect(reverse('accounts:display_account'))  # TODO: go to profile
+            return HttpResponseRedirect(reverse('accounts:display_account'))
     return render(request, 'accounts/sign_up.html', {'form': form})
 
 
@@ -60,48 +60,34 @@ def sign_out(request):
 def display_account(request):
     current_user = request.user
     try:
-        current_user_attributes = Profile.objects.filter(user_id=current_user.id).get()
-        profile_form = ProfileForm(initial= model_to_dict(current_user_attributes))
-        user_form = UserForm(initial=model_to_dict(current_user))
-        if request.method == 'POST':
-            profile_form = ProfileForm(data=request.POST)
-            user_form = UserForm(data=request.POST)
-            if profile_form.is_valid():
-                profile_form.save()
-                user_form.save()
-                return HttpResponseRedirect(reverse('accounts:display_account'))
-        return render(request, 'accounts/display_account.html', {"user": current_user, "profile":current_user_attributes, "profile_form":profile_form, "user_form":user_form})
+        profile = Profile.objects.filter(user_id=current_user.id).get()
+        return render(request, 'accounts/display_account.html', {"profile": profile})
     except:
-        profile_form = ProfileForm()
-        user_form = UserForm(initial=model_to_dict(current_user))
-        if request.method == 'POST':
-            profile_form = ProfileForm(data=request.POST)
-            user_form = UserForm(data=request.POST)
-            if profile_form.is_valid():
-                profile_form.save()
-                user_form.save()
-                return HttpResponseRedirect(reverse('accounts:display_account'))
-        return render(request, 'accounts/display_account.html', {"profile_form": profile_form, "user_form": user_form})
+        return render(request, 'accounts/display_account.html')
 
 
 
 @login_required
 def edit_profile(request):
     current_user = request.user
-    profile_attributes = Profile.objects.filter(user_id=current_user.id).get()
-    profile_form = ProfileForm(initial=model_to_dict(profile_attributes))
-    ##user_form = UserForm(initial=model_to_dict(current_user))
+    user_form = UserForm(initial=model_to_dict(current_user))
+    try:
+        profile_attributes = Profile.objects.filter(user_id=current_user.id).get()
+        profile_form = ProfileForm(initial=model_to_dict(profile_attributes))
+    except:
+        profile_form = ProfileForm()
     if request.method == 'POST':
+        user_profile = UserForm(data=request.POST, instance=current_user)
         submitted_profile = ProfileForm(data=request.POST, files=request.FILES)
-        ##profile_form.data, profile_form.avatar = request.POST, request.FILES
-        ##user_form.data, user_form.instance = request.POST, request.user
-        ##if profile_form.is_valid() and user_form.is_valid():
-        profile = submitted_profile.save(commit=False)
-        profile.user = current_user
-        profile.save()
-        ##user_form.save()
-        return HttpResponseRedirect(reverse('accounts:display_account'))
-    return render(request, 'accounts/edit_account.html',{"profile_form": profile_form})
+        if submitted_profile.is_valid() and user_profile.is_valid():
+            profile = submitted_profile.save(commit=False)
+            profile.user = current_user
+            if len(request.FILES) == 0 and (profile_attributes.avatar != '' or profile_attributes.avatar):
+                profile.avatar = profile_attributes.avatar
+            profile.save()
+            user_profile.save()
+            return HttpResponseRedirect(reverse('accounts:display_account'))
+    return render(request, 'accounts/edit_account.html', {"profile_form": profile_form, "user_form": user_form})
 
 
 @login_required

@@ -1,16 +1,32 @@
 from django import forms
 from django.core.validators import validate_email
-from . import models
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
+from django.http import QueryDict
 #Create a “profile” view to display a user Include a link to edit the profile.
 
+from . import models
 
 class ProfileForm(forms.ModelForm):
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y'])
     bio = forms.CharField(min_length=10, widget=forms.Textarea)
-    avatar = forms.ImageField()
+    avatar = forms.ImageField(required=False)
     user = forms.IntegerField(widget=forms.HiddenInput, required=False)
     id = forms.IntegerField(widget=forms.HiddenInput, required=False)
+
+    def __init__(self, *args, **kwargs):
+        data = kwargs.get('data', None)
+        cleaned_data = {}
+        if data:
+            stripped_kwargs = kwargs
+            for k, v in kwargs.get('data').items():
+                if k in ProfileForm.declared_fields.keys() or k =='csrfmiddlewaretoken':
+                    cleaned_data.update({k:v})
+            qdict = QueryDict('', mutable=True)
+            qdict.update(cleaned_data)
+            stripped_kwargs['data']=qdict
+            super().__init__(*args, **stripped_kwargs)
+        else:
+            super().__init__(*args, **kwargs)
 
     class Meta:
         model = models.Profile
@@ -19,7 +35,24 @@ class ProfileForm(forms.ModelForm):
                   'avatar']
 
 class UserForm(forms.ModelForm):
+    first_name = forms.CharField(min_length=1)
+    last_name = forms.CharField(min_length=1)
     email = forms.EmailField(max_length=254, validators=[validate_email])
+
+    def __init__(self, *args, **kwargs):
+        data = kwargs.get('data', None)
+        cleaned_data = {}
+        if data:
+            stripped_kwargs = kwargs
+            for k, v in kwargs.get('data').items():
+                if k in UserForm.declared_fields.keys() or k =='csrfmiddlewaretoken':
+                    cleaned_data.update({k:v})
+            qdict = QueryDict('', mutable=True)
+            qdict.update(cleaned_data)
+            stripped_kwargs['data']=qdict
+            super().__init__(*args, **stripped_kwargs)
+        else:
+            super().__init__(*args, **kwargs)
 
     class Meta:
         model = models.User
@@ -40,4 +73,6 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['old_password'].label = "Current Password"
         self.fields['new_password1'].label = "New Password"
         self.fields['new_password2'].label = "Confirm Password"
+
+
 

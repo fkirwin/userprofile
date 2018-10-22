@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     url(r'^$', views.home, name='home'),
 ]
-urlpatterns += staticfiles_urlpatterns() + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+#urlpatterns += staticfiles_urlpatterns() + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += staticfiles_urlpatterns() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
