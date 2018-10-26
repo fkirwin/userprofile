@@ -12,6 +12,7 @@ from .forms import ProfileForm, UserForm, ChangePasswordForm
 
 
 def sign_in(request):
+    """Signs user in.  Uses default Django forms and models."""
     form = AuthenticationForm()
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -37,6 +38,7 @@ def sign_in(request):
 
 
 def sign_up(request):
+    """Used for user registration.  Uses default forms and models from Django."""
     form = UserCreationForm()
     if request.method == 'POST':
         form = UserCreationForm(data=request.POST)
@@ -53,12 +55,14 @@ def sign_up(request):
 
 
 def sign_out(request):
+    """Default sign out view."""
     logout(request)
     messages.success(request, "You've been signed out. Come back soon!")
     return HttpResponseRedirect(reverse('home'))
 
-
+@login_required
 def display_account(request):
+    """Simple view to display user data and their profile."""
     current_user = request.user
     try:
         profile = Profile.objects.filter(user_id=current_user.id).get()
@@ -70,6 +74,10 @@ def display_account(request):
 
 @login_required
 def edit_profile(request):
+    """
+    View to allow user to setup or edit their profile.  Uses a user form and a profile form.
+    Will write to the default django model and a custom profile model.
+    """
     current_user = request.user
     user_form = UserForm(initial=model_to_dict(current_user))
     try:
@@ -88,20 +96,22 @@ def edit_profile(request):
             profile.save()
             user_profile.save()
             return HttpResponseRedirect(reverse('accounts:display_account'))
+        else:
+            messages.error(request, 'Please correct the error below.')
     return render(request, 'accounts/edit_account.html', {"profile_form": profile_form, "user_form": user_form})
 
 
 @login_required
 def change_password(request):
+    """View to update user password.  Uses default change password form."""
+    form = ChangePasswordForm(request.user)
     if request.method == 'POST':
-        form = ChangePasswordForm(request.user, request.POST)
+        form = ChangePasswordForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
-            HttpResponseRedirect(reverse('accounts:display_account'))
+            return HttpResponseRedirect(reverse('accounts:display_account'))
         else:
             messages.error(request, 'Please correct the error below.')
-    else:
-        form = ChangePasswordForm(request.user)
     return render(request, 'accounts/change_password.html', {'form': form})

@@ -48,6 +48,7 @@
                         {% if user.is_authenticated %}
                         <li><a href="{% url 'accounts:display_account' %}">View Profile</a></li>
                         <li><a href="{% url 'accounts:edit_profile' %}">Edit Profile</a></li>
+                        <li><a href="{% url 'accounts:change_password' %}">Change Password</a></li>
                         {% endif %}
                     </ul>
                 </nav>
