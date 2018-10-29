@@ -84,6 +84,7 @@ def edit_profile(request):
         profile_attributes = Profile.objects.filter(user_id=current_user.id).get()
         profile_form = ProfileForm(initial=model_to_dict(profile_attributes))
     except:
+        profile_attributes = None
         profile_form = ProfileForm()
     if request.method == 'POST':
         user_profile = UserForm(data=request.POST, instance=current_user)
@@ -91,7 +92,9 @@ def edit_profile(request):
         if submitted_profile.is_valid() and user_profile.is_valid():
             profile = submitted_profile.save(commit=False)
             profile.user = current_user
-            if len(request.FILES) == 0 and (profile_attributes.avatar != '' or profile_attributes.avatar):
+            if len(request.FILES) == 0 and not profile_attributes:
+                profile.avatar = 'chevron.svg'
+            elif len(request.FILES) == 0 and profile_attributes.avatar:
                 profile.avatar = profile_attributes.avatar
             profile.save()
             user_profile.save()

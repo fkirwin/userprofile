@@ -87,7 +87,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'accounts.validators.SpecialCharacterValidator',
+    },
+    {
+        'NAME': 'accounts.validators.AlphaLowerCharacterValidator',
+    },
+    {
+        'NAME': 'accounts.validators.AlphaUpperCharacterValidator',
+    },
+    {
+        'NAME': 'accounts.validators.NumericCharacterValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
@@ -102,16 +111,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
     {
-        'NAME': 'accounts.validators.SpecialCharacterValidator',
-    },
-    {
-        'NAME': 'accounts.validators.AlphaLowerCharacterValidator',
-    },
-    {
-        'NAME': 'accounts.validators.AlphaUpperCharacterValidator',
-    },
-    {
-        'NAME': 'accounts.validators.NumericCharacterValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'max_similarity': .4
+        }
     },
 ]
 

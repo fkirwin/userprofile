@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import validate_email
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import QueryDict
-
+from django.contrib.auth import authenticate, get_user_model, password_validation
 
 from . import models
 
@@ -96,8 +96,8 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['new_password2'].label = "Confirm Password"
 
     def clean(self):
-        cleaned_data = super().clean()
-        old_password = cleaned_data.get('old_password')
-        new_password = cleaned_data.get('new_password1')
+        old_password = self.cleaned_data.get('old_password')
+        new_password = self.cleaned_data.get('new_password1')
         if old_password == new_password:
             raise forms.ValidationError('Old password and new password should not match.')
+        return self.cleaned_data
